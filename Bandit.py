@@ -10,44 +10,65 @@ import os
 
 
 class Bandit(ABC):
-    """ """
+    """
+    Abstract base class for multi-armed bandirlgorithms.
+    
+    All bandit implementations must inherit from this class.
+    """
     @abstractmethod
     def __init__(self, p):
+        """Initialize bandit with true reward probability."""
         pass
 
     @abstractmethod
     def __repr__(self):
+        """String representation of bandit."""
         pass
 
     @abstractmethod
     def pull(self):
-        """ """
+        """Pull the bandit and receive reward."""
         pass
 
     @abstractmethod
     def update(self):
-        """ """
+        """Update bandit statistics based on reward."""
         pass
 
     @abstractmethod
     def experiment(self):
-        """ """
+        """Run bandit experiment."""
         pass
 
     @abstractmethod
     def report(self):
-        """ """
+        """Report bandit statistics."""
         pass
 
 
 class Visualization():
-    """ """
+    """
+    Visualization class for bandit algorithm results.
+    
+    Attributes:
+        bandit_results (List[dict]): List of bandit experiment results.
+    """
     
     def __init__(self, bandit_results: List[dict]):
+        """
+        Initialize visualization with bandit results.
+        
+        Args:
+            bandit_results (List[dict]): List of dictionaries containing results.
+        """
         self.bandit_results = bandit_results
     
     def plot1(self):
-        """ """
+        """
+        Plot individual bandit performance over time.
+        
+        Generates linear and log scale plots showing estimated means.
+        """
         fig, axes = plt.subplots(2, 1, figsize=(12, 10))
         
         for bandit in self.bandit_results:
@@ -112,7 +133,7 @@ class Visualization():
 
 
 class EpsilonGreedy(Bandit):
-    """ """
+    
     
     def __init__(self, p):
 
@@ -127,13 +148,13 @@ class EpsilonGreedy(Bandit):
         return f'EpsilonGreedy(p={self.p}, p_estimate={self.p_estimate:.2f}, N={self.N})'
     
     def pull(self):
-        """ """
+        
         reward = np.random.normal(self.p, scale=1.0)
         self.last_reward = reward
         return reward
     
     def update(self):
-        """ """
+        
         reward = self.last_reward
         self.N += 1
         self.rewards.append(reward)
@@ -141,11 +162,11 @@ class EpsilonGreedy(Bandit):
         self.epsilon = 1.0 / self.N if self.N > 0 else 1.0
     
     def experiment(self):
-        """ """
+        
         pass
     
     def report(self):
-        """ """
+        
 
         if self.N == 0:
             print(f"EpsilonGreedy Bandit (p={self.p}): No pulls yet")
@@ -160,7 +181,7 @@ class EpsilonGreedy(Bandit):
 
 
 class ThompsonSampling(Bandit):
-    """ """
+    
     
     def __init__(self, p, tau=1.0, mu_0=0.0, lambda_0=1.0):
         self.p = p
@@ -178,13 +199,13 @@ class ThompsonSampling(Bandit):
         return f'ThompsonSampling(p={self.p}, mu={self.mu:.2f}, lambda={self.lambda_posterior:.2f}, N={self.N})'
     
     def pull(self):
-        """ """
+        
         reward = np.random.normal(self.p, scale=1.0/np.sqrt(self.tau))
         self.last_reward = reward
         return reward
     
     def update(self):
-        """ """
+        
         reward = self.last_reward
         self.N += 1
         self.rewards.append(reward)
@@ -195,7 +216,7 @@ class ThompsonSampling(Bandit):
         self.mu = (self.lambda_0 * self.mu_0 + self.tau * sum_rewards) / self.lambda_posterior
     
     def sample(self):
-        """ """
+        
         posterior_var = 1.0 / self.lambda_posterior
         return np.random.normal(self.mu, scale=np.sqrt(posterior_var))
     
@@ -212,7 +233,7 @@ class ThompsonSampling(Bandit):
         pass
     
     def report(self):
-        """ """
+        
         if self.N == 0:
             print(f"ThompsonSampling Bandit (p={self.p}): No pulls yet")
             return
@@ -355,7 +376,7 @@ def run_thompson_sampling_experiment(bandit_rewards: List[float], num_trials: in
 
 
 def comparison():
-    """ """
+    
     bandit_rewards = [1, 2, 3, 4]
     num_trials = 20000
     
