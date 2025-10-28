@@ -163,6 +163,44 @@ def run_parallel_experiments(num_runs: int = 100, num_trials: int = 20000, bandi
     Returns:
         Dictionary with mean and std statistics
     """
+    logger.info(f"Running {num_runs} parallel experiments with {num_trials} trials each...")
+    
+    all_cumulative_rewards = []
+    all_cumulative_regrets = []
+    
+    for run in range(num_runs):
+        if run % 10 == 0:
+            logger.info(f"Completed {run}/{num_runs} runs...")
+        
+        results, _ = run_custom_sampling_experiment(bandit_rewards, num_trials, epsilon_0=1.0, k=0.005)
+        all_cumulative_rewards.append(results['cumulative_rewards'])
+        all_cumulative_regrets.append(results['cumulative_regrets'])
+    
+    all_cumulative_rewards = np.array(all_cumulative_rewards)
+    all_cumulative_regrets = np.array(all_cumulative_regrets)
+    
+    rewards_mean = np.mean(all_cumulative_rewards, axis=0)
+    rewards_std = np.std(all_cumulative_rewards, axis=0)
+    regrets_mean = np.mean(all_cumulative_regrets, axis=0)
+    regrets_std = np.std(all_cumulative_regrets, axis=0)
+    
+    logger.info("Parallel experiments completed!")
+    
+    return {
+        'rewards_mean': rewards_mean,
+        'rewards_std': rewards_std,
+        'regrets_mean': regrets_mean,
+        'regrets_std': regrets_std,
+        'num_runs': num_runs
+    }
+
+
+def plot_parallel_results(parallel_results: dict):
+    """
+    Visualize parallel experiment results with confidence bands.
+    
+    Args:
+        parallel_results: Dictionary with mean and std statistics
     """
     fig, axes = plt.subplots(2, 1, figsize=(12, 10))
     
