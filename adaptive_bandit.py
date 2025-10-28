@@ -8,10 +8,25 @@ from Bandit import Bandit
 
 
 class AdaptiveEpsilonGreedy(Bandit):
-    """ """
+    """
+    Adaptive Epsilon-Greedy with Exponential Decay.
+    
+    Enhancement over standard epsilon-greedy:
+    - Uses exponential decay: epsilon(t) = epsilon_0 * e^(-kt)
+    - Provides more controlled exploration schedule
+    - Better for uncertain or non-stationary environments
+    - k parameter controls decay rate (smaller = slower decay, more exploration)
+    """
     
     def __init__(self, p, epsilon_0=1.0, k=0.005):
-
+        """
+        Initialize adaptive epsilon-greedy bandit.
+        
+        Args:
+            p: True mean reward of bandit arm
+            epsilon_0: Initial exploration probability
+            k: Decay rate parameter (smaller = slower decay)
+        """
         self.p = p
         self.p_estimate = 0.0
         self.N = 0
@@ -25,13 +40,20 @@ class AdaptiveEpsilonGreedy(Bandit):
         return f'AdaptiveEpsilonGreedy(p={self.p}, p_estimate={self.p_estimate:.2f}, N={self.N})'
     
     def pull(self):
-        """ """
+        """Pull bandit arm and receive reward."""
         reward = np.random.normal(self.p, scale=1.0)
         self.last_reward = reward
         return reward
     
     def update(self):
-        """ """
+        """
+        Update bandit statistics with exponential epsilon decay.
+        
+        Key difference from standard epsilon-greedy:
+        - Uses exponential function for epsilon decay instead of 1/t
+        - Allows more fine-tuned control over exploration schedule
+        - Maintains higher epsilon longer for uncertain environments
+        """
         reward = self.last_reward
         self.N += 1
         self.rewards.append(reward)
@@ -39,11 +61,11 @@ class AdaptiveEpsilonGreedy(Bandit):
         self.epsilon = self.epsilon_0 * np.exp(-self.k * self.N)
     
     def experiment(self):
-        """ """
+        
         pass
     
     def report(self):
-        """ """
+        
         if self.N == 0:
             print(f"AdaptiveEpsilonGreedy Bandit (p={self.p}): No pulls yet")
             return
@@ -53,15 +75,19 @@ class AdaptiveEpsilonGreedy(Bandit):
 
 def run_custom_sampling_experiment(bandit_rewards: List[float], num_trials: int, epsilon_0: float = 1.0, k: float = 0.005) -> Tuple[dict, pd.DataFrame]:
     """
-
+    Run Adaptive Epsilon-Greedy experiment with exponential decay.
+    
+    Compares adaptive epsilon-greedy using exponential decay formula:
+    epsilon(t) = epsilon_0 * e^(-kt)
+    
     Args:
-      bandit_rewards: List[float]: 
-      num_trials: int: 
-      epsilon_0: float:  (Default value = 1.0)
-      k: float:  (Default value = 0.005)
-
+        bandit_rewards: True mean rewards for each arm
+        num_trials: Number of trials
+        epsilon_0: Initial exploration probability
+        k: Decay rate (smaller = more exploration)
+        
     Returns:
-
+        Results dictionary and DataFrame with trial data
     """
     logger.info(f"Starting Adaptive Epsilon Greedy experiment with {num_trials} trials")
     logger.info(f"Parameters: epsilon_0={epsilon_0}, k={k}")
@@ -122,58 +148,21 @@ def run_custom_sampling_experiment(bandit_rewards: List[float], num_trials: int,
 
 def run_parallel_experiments(num_runs: int = 100, num_trials: int = 20000, bandit_rewards: List[float] = [1, 2, 3, 4]):
     """
-
+    Run multiple parallel experiments for statistical robustness.
+    
+    Purpose:
+    - Provides statistical confidence in results
+    - Shows variance across different runs
+    - Generates mean and standard deviation for visualizations
+    
     Args:
-      num_runs: int:  (Default value = 100)
-      num_trials: int:  (Default value = 20000)
-      bandit_rewards: List[float]:  (Default value = [1)
-      2: 
-      3: 
-      4]: 
-
-    Returns:
-
-    """
-    logger.info(f"Running {num_runs} parallel experiments with {num_trials} trials each...")
-    
-    all_cumulative_rewards = []
-    all_cumulative_regrets = []
-    
-    for run in range(num_runs):
-        if run % 10 == 0:
-            logger.info(f"Completed {run}/{num_runs} runs...")
+        num_runs: Number of independent experimental runs
+        num_trials: Trials per run
+        bandit_rewards: Reward values for bandit arms
         
-        results, _ = run_custom_sampling_experiment(bandit_rewards, num_trials, epsilon_0=1.0, k=0.005)
-        all_cumulative_rewards.append(results['cumulative_rewards'])
-        all_cumulative_regrets.append(results['cumulative_regrets'])
-    
-    all_cumulative_rewards = np.array(all_cumulative_rewards)
-    all_cumulative_regrets = np.array(all_cumulative_regrets)
-    
-    rewards_mean = np.mean(all_cumulative_rewards, axis=0)
-    rewards_std = np.std(all_cumulative_rewards, axis=0)
-    regrets_mean = np.mean(all_cumulative_regrets, axis=0)
-    regrets_std = np.std(all_cumulative_regrets, axis=0)
-    
-    logger.info("Parallel experiments completed!")
-    
-    return {
-        'rewards_mean': rewards_mean,
-        'rewards_std': rewards_std,
-        'regrets_mean': regrets_mean,
-        'regrets_std': regrets_std,
-        'num_runs': num_runs
-    }
-
-
-def plot_parallel_results(parallel_results: dict):
-    """
-
-    Args:
-      parallel_results: dict: 
-
     Returns:
-
+        Dictionary with mean and std statistics
+    """
     """
     fig, axes = plt.subplots(2, 1, figsize=(12, 10))
     

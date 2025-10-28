@@ -14,7 +14,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def bonus_comparison():
-    """ """
+    """
+    Comprehensive comparison of all three bandit algorithms.
+    
+    Runs Epsilon Greedy, Thompson Sampling, and Adaptive Epsilon Greedy:
+    - Generates separate CSV reports for each algorithm
+    - Creates comparison visualizations
+    - Runs parallel experiments for statistical validation
+    - Prints comparative statistics
+    """
     bandit_rewards = [1, 2, 3, 4]
     num_trials = 20000
     
