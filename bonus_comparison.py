@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def bonus_comparison():
+    """ """
     bandit_rewards = [1, 2, 3, 4]
     num_trials = 20000
     

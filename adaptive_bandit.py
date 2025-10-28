@@ -8,6 +8,7 @@ from Bandit import Bandit
 
 
 class AdaptiveEpsilonGreedy(Bandit):
+    """ """
     
     def __init__(self, p, epsilon_0=1.0, k=0.005):
 
@@ -24,11 +25,13 @@ class AdaptiveEpsilonGreedy(Bandit):
         return f'AdaptiveEpsilonGreedy(p={self.p}, p_estimate={self.p_estimate:.2f}, N={self.N})'
     
     def pull(self):
+        """ """
         reward = np.random.normal(self.p, scale=1.0)
         self.last_reward = reward
         return reward
     
     def update(self):
+        """ """
         reward = self.last_reward
         self.N += 1
         self.rewards.append(reward)
@@ -36,9 +39,11 @@ class AdaptiveEpsilonGreedy(Bandit):
         self.epsilon = self.epsilon_0 * np.exp(-self.k * self.N)
     
     def experiment(self):
+        """ """
         pass
     
     def report(self):
+        """ """
         if self.N == 0:
             print(f"AdaptiveEpsilonGreedy Bandit (p={self.p}): No pulls yet")
             return
@@ -47,6 +52,17 @@ class AdaptiveEpsilonGreedy(Bandit):
 
 
 def run_custom_sampling_experiment(bandit_rewards: List[float], num_trials: int, epsilon_0: float = 1.0, k: float = 0.005) -> Tuple[dict, pd.DataFrame]:
+    """
+
+    Args:
+      bandit_rewards: List[float]: 
+      num_trials: int: 
+      epsilon_0: float:  (Default value = 1.0)
+      k: float:  (Default value = 0.005)
+
+    Returns:
+
+    """
     logger.info(f"Starting Adaptive Epsilon Greedy experiment with {num_trials} trials")
     logger.info(f"Parameters: epsilon_0={epsilon_0}, k={k}")
     
@@ -105,6 +121,19 @@ def run_custom_sampling_experiment(bandit_rewards: List[float], num_trials: int,
 
 
 def run_parallel_experiments(num_runs: int = 100, num_trials: int = 20000, bandit_rewards: List[float] = [1, 2, 3, 4]):
+    """
+
+    Args:
+      num_runs: int:  (Default value = 100)
+      num_trials: int:  (Default value = 20000)
+      bandit_rewards: List[float]:  (Default value = [1)
+      2: 
+      3: 
+      4]: 
+
+    Returns:
+
+    """
     logger.info(f"Running {num_runs} parallel experiments with {num_trials} trials each...")
     
     all_cumulative_rewards = []
@@ -138,6 +167,14 @@ def run_parallel_experiments(num_runs: int = 100, num_trials: int = 20000, bandi
 
 
 def plot_parallel_results(parallel_results: dict):
+    """
+
+    Args:
+      parallel_results: dict: 
+
+    Returns:
+
+    """
     fig, axes = plt.subplots(2, 1, figsize=(12, 10))
     
     num_trials = len(parallel_results['rewards_mean'])

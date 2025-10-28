@@ -10,6 +10,7 @@ import os
 
 
 class Bandit(ABC):
+    """ """
     @abstractmethod
     def __init__(self, p):
         pass
@@ -20,27 +21,33 @@ class Bandit(ABC):
 
     @abstractmethod
     def pull(self):
+        """ """
         pass
 
     @abstractmethod
     def update(self):
+        """ """
         pass
 
     @abstractmethod
     def experiment(self):
+        """ """
         pass
 
     @abstractmethod
     def report(self):
+        """ """
         pass
 
 
 class Visualization():
+    """ """
     
     def __init__(self, bandit_results: List[dict]):
         self.bandit_results = bandit_results
     
     def plot1(self):
+        """ """
         fig, axes = plt.subplots(2, 1, figsize=(12, 10))
         
         for bandit in self.bandit_results:
@@ -71,6 +78,15 @@ class Visualization():
         plt.close()
     
     def plot2(self, eg_results: dict, ts_results: dict):
+        """
+
+        Args:
+          eg_results: dict: 
+          ts_results: dict: 
+
+        Returns:
+
+        """
         fig, axes = plt.subplots(2, 1, figsize=(12, 10))
         
 
@@ -96,6 +112,7 @@ class Visualization():
 
 
 class EpsilonGreedy(Bandit):
+    """ """
     
     def __init__(self, p):
 
@@ -110,11 +127,13 @@ class EpsilonGreedy(Bandit):
         return f'EpsilonGreedy(p={self.p}, p_estimate={self.p_estimate:.2f}, N={self.N})'
     
     def pull(self):
+        """ """
         reward = np.random.normal(self.p, scale=1.0)
         self.last_reward = reward
         return reward
     
     def update(self):
+        """ """
         reward = self.last_reward
         self.N += 1
         self.rewards.append(reward)
@@ -122,9 +141,11 @@ class EpsilonGreedy(Bandit):
         self.epsilon = 1.0 / self.N if self.N > 0 else 1.0
     
     def experiment(self):
+        """ """
         pass
     
     def report(self):
+        """ """
 
         if self.N == 0:
             print(f"EpsilonGreedy Bandit (p={self.p}): No pulls yet")
@@ -139,6 +160,7 @@ class EpsilonGreedy(Bandit):
 
 
 class ThompsonSampling(Bandit):
+    """ """
     
     def __init__(self, p, tau=1.0, mu_0=0.0, lambda_0=1.0):
         self.p = p
@@ -156,11 +178,13 @@ class ThompsonSampling(Bandit):
         return f'ThompsonSampling(p={self.p}, mu={self.mu:.2f}, lambda={self.lambda_posterior:.2f}, N={self.N})'
     
     def pull(self):
+        """ """
         reward = np.random.normal(self.p, scale=1.0/np.sqrt(self.tau))
         self.last_reward = reward
         return reward
     
     def update(self):
+        """ """
         reward = self.last_reward
         self.N += 1
         self.rewards.append(reward)
@@ -171,18 +195,24 @@ class ThompsonSampling(Bandit):
         self.mu = (self.lambda_0 * self.mu_0 + self.tau * sum_rewards) / self.lambda_posterior
     
     def sample(self):
+        """ """
         posterior_var = 1.0 / self.lambda_posterior
         return np.random.normal(self.mu, scale=np.sqrt(posterior_var))
     
     def experiment(self):
-        """
-        Placeholder for experiment method.
+        """Placeholder for experiment method.
         This is called at the bandit level, but the actual experiment logic
         is in the multi-arm bandit context.
+
+        Args:
+
+        Returns:
+
         """
         pass
     
     def report(self):
+        """ """
         if self.N == 0:
             print(f"ThompsonSampling Bandit (p={self.p}): No pulls yet")
             return
@@ -197,6 +227,15 @@ class ThompsonSampling(Bandit):
 
 
 def run_epsilon_greedy_experiment(bandit_rewards: List[float], num_trials: int) -> Tuple[dict, pd.DataFrame]:
+    """
+
+    Args:
+      bandit_rewards: List[float]: 
+      num_trials: int: 
+
+    Returns:
+
+    """
     logger.info(f"Starting Epsilon Greedy experiment with {num_trials} trials")
     
     bandits = [EpsilonGreedy(p) for p in bandit_rewards]
@@ -254,6 +293,16 @@ def run_epsilon_greedy_experiment(bandit_rewards: List[float], num_trials: int) 
 
 
 def run_thompson_sampling_experiment(bandit_rewards: List[float], num_trials: int, tau: float = 1.0) -> Tuple[dict, pd.DataFrame]:
+    """
+
+    Args:
+      bandit_rewards: List[float]: 
+      num_trials: int: 
+      tau: float:  (Default value = 1.0)
+
+    Returns:
+
+    """
     logger.info(f"Starting Thompson Sampling experiment with {num_trials} trials")
     
     bandits = [ThompsonSampling(p, tau=tau) for p in bandit_rewards]
@@ -306,6 +355,7 @@ def run_thompson_sampling_experiment(bandit_rewards: List[float], num_trials: in
 
 
 def comparison():
+    """ """
     bandit_rewards = [1, 2, 3, 4]
     num_trials = 20000
     
